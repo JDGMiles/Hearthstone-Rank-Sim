@@ -1,0 +1,46 @@
+<!DOCTYPE html><html>
+
+<head>
+  <title>Hearthstone Ladder Sim</title>
+  <link rel="shortcut icon" href="favicon.ico">
+  <meta name="viewport" content="width=700">
+</head>
+
+<body style="background-color:white"><center>
+  <canvas id="canvas"></canvas>
+</center></body>
+
+</html>
+
+<script type="text/javascript">
+var fps=60;
+
+var rank=[]; for(i=0; i<25; i++){rank[i]=new Image(); rank[i].src="images/"+(i+1)+".png";}
+var r={w:85, h:0}; r.h=185*r.w/141;
+var yspacer=25;
+
+var field={width:r.w*5, height:(r.h+yspacer)*5};
+var canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d"); canvas.width = field.width; canvas.height = field.height;
+
+function frame(){
+
+  ctx.fillStyle="#000000";
+  ctx.fillRect(0,0,field.width,field.height);
+
+  var xpos=0, ypos=0;
+
+  for(i=0; i<25; i++){
+
+    xpos=r.w*(i%5);
+    ypos=(r.h+yspacer)*Math.floor(i/5)+yspacer;
+    ctx.drawImage(rank[24-i], xpos,ypos,r.w,r.h);
+
+  }
+
+	setTimeout(frame,1000/fps);
+
+}
+
+frame();
+
+</script>
