@@ -3,15 +3,33 @@
 <head>
   <title>Hearthstone Ladder Sim</title>
   <link rel="shortcut icon" href="favicon.ico">
-  <meta name="viewport" content="width=700">
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=1000, initial-scale=1">
 </head>
 
-<body style="background-color:white"><center>
-  <table><tr>
-    <td><canvas id="canvas"></canvas></td>
-    <td><a id="winpercentage">Chance of game win: 100%</a></td>
-  </tr></table>
-</center></body>
+<body id="everything"><center><table><tr>
+
+  <td style="padding:0px 30px 0px 0px; font-size:22px; width:100px; min-width:100px"><center>
+    <span id="a" style="opacity:0">WON <span id="a1">10</span><br>LOST <span id="a2">10</span><br><span id="a3">100</span>%</span>
+    <br><br><br><span id="b" style="opacity:0">WON <span id="b1">10</span><br>LOST <span id="b2">10</span><br><span id="b3">100</span>%</span>
+    <br><br><br><span id="c" style="opacity:0">WON <span id="c1">10</span><br>LOST <span id="c2">10</span><br><span id="c3">100</span>%</span>
+    <br><br><br><span id="d" style="opacity:0">WON <span id="d1">10</span><br>LOST <span id="d2">10</span><br><span id="d3">100</span>%</span>
+    <br><br><br><span id="e" style="opacity:0">WON <span id="e1">10</span><br>LOST <span id="e2">10</span><br><span id="e3">100</span>%</span>
+  </center></td>
+
+  <td><canvas id="canvas"></canvas></td>
+
+  <td id="rightpanel" style="padding:0px 0px 0px 30px; text-align:center; width:460px; min-width:460px; opacity:1; position:relative;">
+    <a style="font-size:27px">Hearthstone&rsquo;s ranked play mode simulated as a random walk.<br><br>The chance of winning a game begins at 100% and decreases (increases)<br>by ~0.53% when a star is won (lost).<br><br>Blue stars are those which were won as bonuses on a 3 or more win streak.</a><br><br><br>
+    <a>_________________________________________________________</a><br><br><br>
+    <a style="font-size:42px">Chance of Winning (%):<br><br><br></a>
+    <span id="starting100" style="font-size:120px; position:absolute; top:520px; left:148px">100</span>
+    <span id="winpercentage1" style="font-size:120px; position:absolute; top:520px; left:129px"></span>
+    <span id="dot" style="font-size:120px; position:absolute; top:520px; left:269px"></span>
+    <span id="winpercentage2" style="font-size:120px; position:absolute; top:520px; left:306px"></span>
+  </td>
+
+</tr></table></center></body>
 
 </html>
 
@@ -22,8 +40,10 @@ var rank=[]; for(i=0; i<25; i++){rank[i]=new Image(); rank[i].src="images/"+(i+1
 var r={w:85, h:0}; r.h=185*r.w/141;
 var yspacer=25;
 
-var point=new Image(); point.src="images/star.png";
-var slot=new Image(); slot.src="images/slot.png";
+var slotx=[];
+slotx[0]=new Image(); slotx[0].src="images/slot.png";
+slotx[1]=new Image(); slotx[1].src="images/star.png";
+slotx[2]=new Image(); slotx[2].src="images/star4.png";
 
 var stargot=[]; for(i=0; i<95; i++){stargot[i]=0}
 var s={w:19, h:0}; s.h=69*s.w/73;
@@ -31,12 +51,19 @@ var s={w:19, h:0}; s.h=69*s.w/73;
 var field={width:r.w*5, height:(r.h+yspacer)*5};
 var canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d"); canvas.width = field.width; canvas.height = field.height;
 
+var time=0;
+var maxtime=100000;
+
+var atime=-1, btime=-1, ctime=-1, dtime=-1, etime=-1;
+var fadespeed=19;
+
 function frame(){
 
   ctx.fillStyle="#000000";
   ctx.fillRect(0,0,field.width,field.height);
 
   var xpos=0, ypos=0;
+  var tempstar=0;
 
   for(i=0; i<25; i++){
 
@@ -45,46 +72,56 @@ function frame(){
     ctx.drawImage(rank[24-i], xpos,ypos,r.w,r.h);
 
     if(i<5){
-      if(stargot[i*2]){ctx.drawImage(point, xpos+r.w/2-s.w/2-11, ypos-16,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2-11, ypos-16,s.w,s.h);}
-      if(stargot[1+i*2]){ctx.drawImage(point, xpos+r.w/2-s.w/2+11, ypos-16,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2+11, ypos-16,s.w,s.h);}
+      ctx.drawImage(slotx[stargot[i*2]], xpos+r.w/2-s.w/2-11, ypos-16,s.w,s.h);
+      ctx.drawImage(slotx[stargot[1+i*2]], xpos+r.w/2-s.w/2+11, ypos-16,s.w,s.h);
     }
 
     else if(i>4 && i<10){
-      if(stargot[10+(i-5)*3]){ctx.drawImage(point, xpos+r.w/2-s.w/2-25, ypos-18+10,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2-25, ypos-18+10,s.w,s.h);}
-      if(stargot[11+(i-5)*3]){ctx.drawImage(point, xpos+r.w/2-s.w/2, ypos-18,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2, ypos-18,s.w,s.h);}
-      if(stargot[12+(i-5)*3]){ctx.drawImage(point, xpos+r.w/2-s.w/2+25, ypos-18+10,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2+25, ypos-18+10,s.w,s.h);}
+      ctx.drawImage(slotx[stargot[10+(i-5)*3]], xpos+r.w/2-s.w/2-25, ypos-18+10,s.w,s.h);
+      ctx.drawImage(slotx[stargot[11+(i-5)*3]], xpos+r.w/2-s.w/2, ypos-18,s.w,s.h);
+      ctx.drawImage(slotx[stargot[12+(i-5)*3]], xpos+r.w/2-s.w/2+25, ypos-18+10,s.w,s.h);
     }
 
     else if(i>9 && i<15){
-      if(stargot[25+(i-10)*4]){ctx.drawImage(point, xpos+r.w/2-s.w/2-30, ypos-5,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2-30, ypos-5,s.w,s.h);}
-      if(stargot[26+(i-10)*4]){ctx.drawImage(point, xpos+r.w/2-s.w/2-11, ypos-16,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2-11, ypos-16,s.w,s.h);}
-      if(stargot[27+(i-10)*4]){ctx.drawImage(point, xpos+r.w/2-s.w/2+11, ypos-16,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2+11, ypos-16,s.w,s.h);}
-      if(stargot[28+(i-10)*4]){ctx.drawImage(point, xpos+r.w/2-s.w/2+30, ypos-5,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2+30, ypos-5,s.w,s.h);}
+      ctx.drawImage(slotx[stargot[25+(i-10)*4]], xpos+r.w/2-s.w/2-30, ypos-5,s.w,s.h);
+      ctx.drawImage(slotx[stargot[26+(i-10)*4]], xpos+r.w/2-s.w/2-11, ypos-16,s.w,s.h);
+      ctx.drawImage(slotx[stargot[27+(i-10)*4]], xpos+r.w/2-s.w/2+11, ypos-16,s.w,s.h);
+      ctx.drawImage(slotx[stargot[28+(i-10)*4]], xpos+r.w/2-s.w/2+30, ypos-5,s.w,s.h);
     }
 
     else{
-      if(stargot[45+(i-15)*5]){ctx.drawImage(point, xpos+r.w/2-s.w/2-32, ypos-18+14,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2-32, ypos-18+14,s.w,s.h);}
-      if(stargot[46+(i-15)*5]){ctx.drawImage(point, xpos+r.w/2-s.w/2-16, ypos-18+6,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2-16, ypos-18+6,s.w,s.h);}
-      if(stargot[47+(i-15)*5]){ctx.drawImage(point, xpos+r.w/2-s.w/2, ypos-18,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2, ypos-18,s.w,s.h);}
-      if(stargot[48+(i-15)*5]){ctx.drawImage(point, xpos+r.w/2-s.w/2+16, ypos-18+6,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2+16, ypos-18+6,s.w,s.h);}
-      if(stargot[49+(i-15)*5]){ctx.drawImage(point, xpos+r.w/2-s.w/2+32, ypos-18+14,s.w,s.h);}
-      else{ctx.drawImage(slot, xpos+r.w/2-s.w/2+32, ypos-18+14,s.w,s.h);}
+      ctx.drawImage(slotx[stargot[45+(i-15)*5]], xpos+r.w/2-s.w/2-32, ypos-18+14,s.w,s.h);
+      ctx.drawImage(slotx[stargot[46+(i-15)*5]], xpos+r.w/2-s.w/2-16, ypos-18+6,s.w,s.h);
+      ctx.drawImage(slotx[stargot[47+(i-15)*5]], xpos+r.w/2-s.w/2, ypos-18,s.w,s.h);
+      ctx.drawImage(slotx[stargot[48+(i-15)*5]], xpos+r.w/2-s.w/2+16, ypos-18+6,s.w,s.h);
+      ctx.drawImage(slotx[stargot[49+(i-15)*5]], xpos+r.w/2-s.w/2+32, ypos-18+14,s.w,s.h);
     }
 
   }
+
+  if(atime>0){
+    document.getElementById("a").style.opacity=(time-atime)*fadespeed/1000+0.18;
+    if((time-atime)*fadespeed/1000>1){atime=-1;}
+  }
+  if(btime>0){
+    document.getElementById("b").style.opacity=(time-btime)*fadespeed/1000+0.18;
+    if((time-btime)*fadespeed/1000>1){btime=-1;}
+  }
+  if(ctime>0){
+    document.getElementById("c").style.opacity=(time-ctime)*fadespeed/1000+0.18;
+    if((time-ctime)*fadespeed/1000>1){ctime=-1;}
+  }
+  if(dtime>0){
+    document.getElementById("d").style.opacity=(time-dtime)*fadespeed/1000+0.18;
+    if((time-dtime)*fadespeed/1000>1){dtime=-1;}
+  }
+  if(etime>0){
+    document.getElementById("e").style.opacity=(time-etime)*fadespeed/1000+0.18;
+    if((time-etime)*fadespeed/1000>1){etime=-1;}
+  }
+
+  time++;
+  if(time>maxtime){time=0;}
 
 	setTimeout(frame,1000/fps);
 
@@ -92,35 +129,151 @@ function frame(){
 
 var totalstars=0;
 var winp=100;
-var speed=100;
-var winratechange=0.5;
+var speed=50;
+var winratechange=50/95;
 var streak=0;
+var milestone0=0; milestone1=0, milestone2=0, milestone3=0;
+
+var wincount=0;
+var losscount=0;
+var overallwins=0;
+var overalllosses=0;
 
 function ladder(){
   if(100*Math.random()<winp){
     streak++;
     stargot[totalstars]=1;
     totalstars++;
+    wincount++;
+    overallwins++;
     winp-=winratechange;
     if(streak>2 && totalstars<72){
-      stargot[totalstars]=1;
+      stargot[totalstars]=2;
       totalstars++;
       winp-=winratechange;
     }
-  }
+    }
   else{
     streak=0;
-    stargot[totalstars-1]=0;
-    totalstars--;
-    winp+=winratechange;
+    losscount++;
+    overalllosses++;
+    if(totalstars>10 && (totalstars!=25 || !milestone1) && (totalstars!=45 || !milestone2) && (totalstars!=70 || !milestone3)){
+      stargot[totalstars-1]=0;
+      totalstars--;
+      winp+=winratechange;
+    }
   }
 
-  if(totalstars==95){}
-  else{setTimeout(ladder, 10000/speed)}
+  if(totalstars>10){
+    if(milestone0==0){
+      atime=time;
+      document.getElementById("a1").innerHTML=wincount;
+      document.getElementById("a2").innerHTML=losscount;
+      document.getElementById("a3").innerHTML=Math.floor(100*wincount/(wincount+losscount)+0.5);
+      wincount=0;
+      losscount=0;
+    }
+    milestone0=1;
+  }
+
+  if(totalstars>25){
+    if(milestone1==0){
+      btime=time;
+      document.getElementById("b1").innerHTML=wincount;
+      document.getElementById("b2").innerHTML=losscount;
+      document.getElementById("b3").innerHTML=Math.floor(100*wincount/(wincount+losscount)+0.5);
+      wincount=0;
+      losscount=0;
+    }
+    milestone1=1;
+  }
+
+  if(totalstars>45){
+    if(milestone2==0){
+      ctime=time;
+      document.getElementById("c1").innerHTML=wincount;
+      document.getElementById("c2").innerHTML=losscount;
+      document.getElementById("c3").innerHTML=Math.floor(100*wincount/(wincount+losscount)+0.5);
+      wincount=0;
+      losscount=0;
+    }
+    milestone2=1;
+  }
+
+  if(totalstars>70){
+    if(milestone3==0){
+      dtime=time;
+      document.getElementById("d1").innerHTML=wincount;
+      document.getElementById("d2").innerHTML=losscount;
+      document.getElementById("d3").innerHTML=Math.floor(100*wincount/(wincount+losscount)+0.5);
+      wincount=0;
+      losscount=0;
+    }
+    milestone3=1;
+  }
+
+  if(Math.floor(winp)==winp){
+    document.getElementById("winpercentage1").innerHTML=winp;
+    document.getElementById("winpercentage2").innerHTML="0";
+  }
+  else{
+    document.getElementById("winpercentage1").innerHTML=Math.floor(winp);
+    document.getElementById("winpercentage2").innerHTML=Math.floor(10*(winp%1));
+  }
+
+  if(totalstars==95){
+    document.getElementById("winpercentage1").innerHTML=50;
+    document.getElementById("winpercentage2").innerHTML="0";
+    etime=time;
+    document.getElementById("e1").innerHTML=wincount;
+    document.getElementById("e2").innerHTML=losscount;
+    document.getElementById("e3").innerHTML=Math.floor(100*wincount/(wincount+losscount)+0.5);
+    fadeamount=1;
+    setTimeout(finalefade, 2000)
+  }
+  else{setTimeout(ladder, 10000/(speed+totalstars))}
+}
+
+var fadeamount=0.08;
+
+function fadein(){
+  fadeamount=fadeamount*1.015;
+  document.getElementById("everything").style.opacity=fadeamount;
+  if(fadeamount<1){setTimeout(fadein, 5)}
+  else{
+    setTimeout(beginsim, 6000);
+  }
+}
+
+function beginsim(){
+  document.getElementById("starting100").style.opacity=0;
+  document.getElementById("dot").innerHTML=".";
+  ladder();
+}
+
+var finaledir=-1;
+
+function finalefade(){
+  if(finaledir==-1){fadeamount=fadeamount*0.97;}
+  if(finaledir==1){fadeamount=fadeamount*1.015;}
+  document.getElementById("rightpanel").style.opacity=fadeamount;
+  if(fadeamount<0.05){
+    finaledir=1;
+    fadeamount=0.08;
+    document.getElementById("rightpanel").innerHTML="<img src=\"images/legend.png\"><br><p style=\"font-size:45px\">Total Wins: "+overallwins+"<br>Total Losses: "+overalllosses+"<br>Overall Win Rate: "+Math.floor(100*overallwins/(overallwins+overalllosses)+0.5)+"%</p>";
+  }
+  if(fadeamount<=1){setTimeout(finalefade, 5);}
+  else{setTimeout(restart, 6000);}
+}
+
+function restart(){
+  fadeamount=fadeamount*0.97;
+  document.getElementById("everything").style.opacity=fadeamount;
+  if(fadeamount<0.05){location.reload();}
+  else{setTimeout(restart, 5);}
 }
 
 frame();
-
-setTimeout(ladder, 10000/speed)
+fadein();
 
 </script>
