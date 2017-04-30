@@ -63,7 +63,6 @@ function frame(){
   ctx.fillRect(0,0,field.width,field.height);
 
   var xpos=0, ypos=0;
-  var tempstar=0;
 
   for(i=0; i<25; i++){
 
@@ -123,7 +122,7 @@ function frame(){
   time++;
   if(time>maxtime){time=0;}
 
-	setTimeout(frame,1000/fps);
+  setTimeout(frame,1000/fps);
 
 }
 
@@ -152,7 +151,7 @@ function ladder(){
       totalstars++;
       winp-=winratechange;
     }
-    }
+  }
   else{
     streak=0;
     losscount++;
@@ -240,9 +239,7 @@ function fadein(){
   fadeamount=fadeamount*1.015;
   document.getElementById("everything").style.opacity=fadeamount;
   if(fadeamount<1){setTimeout(fadein, 5)}
-  else{
-    setTimeout(beginsim, 6000);
-  }
+  else{setTimeout(beginsim, 6000)}
 }
 
 function beginsim(){
